@@ -64,7 +64,24 @@ If you don't want to use the wiimote:
 java -Dslides=slides-small -Dnowiimote=true -jar jfx-presentation-shanghai-1.0-jfx.jar
 ```
 
+## Using ##
 
+For now the easiest way of using this is to fork this repo, create your own css and background and write your own
+markdown slides. The transitions aren't that complex so even those are potential targets for change.
+
+To get this to work on an Ubuntu box, you need to set up the tools:
+
+```
+sudo apt-get install phantomjs imagemagick pandoc optipng
+```
+
+Will probably have pretty close to the same packages, but I haven't tried it.
+
+The relative directory for referring to stuff from html is ```src/main/resources/html``` so that is where your images
+and videos go.
+
+After that you just build your jar as described below and run it as describted above.
+ 
 ## Caveats ##
 
 The build works on my Ubuntu workstation and my Ubuntu jenkins server and I really have very little interest in making
