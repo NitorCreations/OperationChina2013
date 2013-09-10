@@ -245,6 +245,15 @@ ButtonListener, GestureListener, InfraredListener{
 		handle(event.getCode());
 	}
 
+	public void handleLater(final KeyCode code) {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				handle(code);
+			}
+		});
+	}
+
 	public synchronized void handle(KeyCode code) {
 		if (!started) {
 			started = true;
@@ -577,22 +586,22 @@ ButtonListener, GestureListener, InfraredListener{
 		System.out.printf("Button pressed %d\n", event.getButton());
 		switch (event.getButton()) {
 		case 256:
-			handle(KeyCode.LEFT);
+			handleLater(KeyCode.LEFT);
 			break;
 		case 512:
-			handle(KeyCode.RIGHT);
+			handleLater(KeyCode.RIGHT);
 			break;
 		case 2048:
-			handle(KeyCode.UP);
+			handleLater(KeyCode.UP);
 			break;
 		case 1024:
-			handle(KeyCode.DOWN);
+			handleLater(KeyCode.DOWN);
 			break;
 		case 16:
-			handle(KeyCode.A);
+			handleLater(KeyCode.A);
 			break;
 		case 1:
-			handle(KeyCode.E);
+			handleLater(KeyCode.E);
 		case 8:
 			a_pressed.set(true);
 			break;
@@ -618,22 +627,22 @@ ButtonListener, GestureListener, InfraredListener{
 	public void gestureReceived(GestureEvent event) {
 		switch (event.getId()) {
 		case 0:
-			handle(KeyCode.RIGHT);
+			handleLater(KeyCode.RIGHT);
 			break;
 		case 1:
-			handle(KeyCode.LEFT);
+			handleLater(KeyCode.LEFT);
 			break;
 		case 2:
-			handle(KeyCode.UP);
+			handleLater(KeyCode.UP);
 			break;
 		case 3:
-			handle(KeyCode.DOWN);
+			handleLater(KeyCode.DOWN);
 			break;
 		case 4:
-			handle(KeyCode.A);
+			handleLater(KeyCode.A);
 			break;
 		case 5:
-			handle(KeyCode.E);
+			handleLater(KeyCode.E);
 			break;
 		}
 	}
