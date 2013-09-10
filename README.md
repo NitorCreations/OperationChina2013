@@ -50,6 +50,21 @@ exec /usr/bin/mplayer -noidle -fs "$@"
 
 Unfortunately on the Raspberry Pi there is currently no way of controlling the playback.
 
+## Running ##
+
+On the raspberry Pi this requires using the smaller images to fit into memory:
+
+```
+java -Dslides=slides-small -jar ffx-presentation-shanghai-1.0-jfx.jar
+```
+
+If you don't want to use the wiimote:
+
+```
+java -Dslides=slides-small -Dnowiimote=true -jar ffx-presentation-shanghai-1.0-jfx.jar
+```
+
+
 ## Caveats ##
 
 The build works on my Ubuntu workstation and my Ubuntu jenkins server and I really have very little interest in making
