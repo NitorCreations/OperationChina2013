@@ -23,7 +23,7 @@ The presentation can be controlled with either a keyboard or a Nintendo Wii cont
     * Zoom out and rotate to original orientation, move to on top of the next slide and then zoom in and rotate for the target slide
 * Down key, Wiimote direction button down or the gesture "down": Fast transition backward
 * Left key, Wiimote direction button left or the gesture "left": Slow transtion backward
-* Key A, Wiimote button '+' or the gesture "clockwise circle": Slow transition to the first slide
+* Key A, Wiimote button '-' or the gesture "clockwise circle": Slow transition to the first slide
 * Key E, Wiimote button '2' or the gesture "counter clockwise circle": Slow transtion to the last slide
 * Wiimote button 'A': draw highlight where the wiimote Infrared mouse is pointing
 * Wiimote button 'B': try to recongnize gesture
