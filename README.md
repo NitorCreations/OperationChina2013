@@ -81,6 +81,14 @@ The relative directory for referring to stuff from html is ```src/main/resources
 and videos go.
 
 After that you just build your jar as described below and run it as describted above.
+
+## Gestures ##
+
+The gesture definitions are in ```src/main/resources/gestureset```. If you would like to make your own, you
+can record them with the [Wiigee Demo GUI](http://www.wiigee.org/download/download.html), put them in that
+directory and add them to the Java code. They need to be added to the loading in ```initWiimote()``` and
+then the event processing needs to be added to ```gestureReceived(GestureEvent event)```. Both are in ```PresentationController```
+class.
  
 ## Caveats ##
 
