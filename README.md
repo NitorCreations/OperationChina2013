@@ -89,7 +89,15 @@ can record them with the [Wiigee Demo GUI](http://www.wiigee.org/download/downlo
 directory and add them to the Java code. They need to be added to the loading in ```initWiimote()``` and
 then the event processing needs to be added to ```gestureReceived(GestureEvent event)```. Both are in ```PresentationController```
 class.
- 
+
+## HTTP server ##
+
+You can start a http server that serves the slides by adding ```-Dhttpport={port}```. Navigating to the root of that
+server will then load all of the slides. Later I plan to enable following the current slide of the presentation being shown
+and to control the slideshow so that you could for example skip some slides.
+
+Also a nice thing I could add would be to offer zip downloads containing either html or the png format of the slides.
+
 ## Caveats ##
 
 The build works on my Ubuntu workstation and my Ubuntu jenkins server and I really have very little interest in making
@@ -123,8 +131,4 @@ include the JNI bits for arm, so I published both of those in a [github maven re
 I'm planning on pushing this as an archetype to the [github maven repository](https://github.com/NitorCreations/maven-repository)
 and central if I get the Wiigee and Bluecove I need in central.
 
-Another thing I'd like to add is an http server that would provide downloads of the presentation in html and png formats and
-a way to go through the presentation in your browser. Also running what is on the screen through the browser would be great - you 
-could get a preview of the next slide to help you with the flow of the presentation. All of this is relatively simple and
-I'll make that when I get around to it.
 

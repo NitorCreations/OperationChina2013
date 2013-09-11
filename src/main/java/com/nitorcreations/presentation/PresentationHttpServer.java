@@ -85,8 +85,6 @@ public class PresentationHttpServer {
 						responseBody.close();
 						return;
 					} else {
-						System.out.println("RANGE request for "  + exchange.getRequestURI().getPath());
-						System.out.println("RANGE: " + range.get(0));
 						List<Range> ranges = new ArrayList<>();
 						for (String nextRange : range) {
 							Range currentRange = new Range();

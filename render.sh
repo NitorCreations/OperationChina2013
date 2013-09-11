@@ -4,6 +4,7 @@ mkdir -p target/classes/slides-small
 
 for slide in target/classes/markdown/*.md; do
   slidename=$(basename $slide .md)
+  sed -i "s/<\!--frames-->/\<iframe src=\"$slidename.html\" width=\"100%\" height=\"100%\" frameborder=\"0\"\><\/iframe>\n<\!--frames-->/" target/classes/html/index.html
   pandoc --from markdown --to html --standalone --css=nitor.css $slide --output target/classes/html/$slidename.html
   phantomjs render.js target/classes/html/$slidename.html target/classes/slides/$slidename.png
   VIDEO=$(phantomjs videoposition.js target/classes/html/$slidename.html)
