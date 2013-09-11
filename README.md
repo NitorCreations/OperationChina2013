@@ -123,3 +123,8 @@ include the JNI bits for arm, so I published both of those in a [github maven re
 I'm planning on pushing this as an archetype to the [github maven repository](https://github.com/NitorCreations/maven-repository)
 and central if I get the Wiigee and Bluecove I need in central.
 
+Another thing I'd like to add is an http server that would provide downloads of the presentation in html and png formats and
+a way to go through the presentation in your browser. Also running what is on the screen through the browser would be great - you 
+could get a preview of the next slide to help you with the flow of the presentation. All of this is relatively simple and
+I'll make that when I get around to it.
+
