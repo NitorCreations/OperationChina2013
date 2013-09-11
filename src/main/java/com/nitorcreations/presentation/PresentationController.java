@@ -9,25 +9,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
@@ -72,9 +65,10 @@ import org.wiigee.event.GestureListener;
 import org.wiigee.event.InfraredEvent;
 import org.wiigee.event.InfraredListener;
 
+@SuppressWarnings("restriction")
 public class PresentationController implements EventHandler<KeyEvent>, 
 ButtonListener, GestureListener, InfraredListener{
-	private static Map<String, Set<String>> jarEntryCache = new HashMap<String, Set<String>>();
+	static Map<String, Set<String>> jarEntryCache = new HashMap<String, Set<String>>();
 
 	ImageView[] slides;
 	private Interpolator SLOW = new SlowingInterpolator();
@@ -96,7 +90,7 @@ ButtonListener, GestureListener, InfraredListener{
 	private boolean videoPlayed = false;
 	private boolean started = false;
 	private SequentialTransition start=null;
-
+	private PresentationHttpServer server;
 	private AtomicBoolean a_pressed = new AtomicBoolean(false);
 	private Path wiiTrail = new Path();
 	private Wiimote wiimote = null;
@@ -111,7 +105,7 @@ ButtonListener, GestureListener, InfraredListener{
 
 	private double lastdeltaY=0;
 
-	public void initialize(AnchorPane root) {
+	public void initialize(AnchorPane root) throws NumberFormatException, IOException, NoSuchAlgorithmException {
 		rootPane = root;
 		String slideDir="slides/";
 		if (System.getProperty("slides") != null) {
@@ -120,7 +114,7 @@ ButtonListener, GestureListener, InfraredListener{
 				slideDir = slideDir + "/";
 			}
 		}
-		List<String> slideNames = Arrays.asList(getResourceListing(slideDir));
+		List<String> slideNames = Arrays.asList(Utils.getResourceListing(slideDir));
 		Collections.sort(slideNames);
 		ArrayList<ImageView> slideList = new ArrayList<>();
 		for (String next : slideNames) {
@@ -128,7 +122,7 @@ ButtonListener, GestureListener, InfraredListener{
 			if (next.endsWith(".video")) {
 				ImageView nextView = slideList.get(slideList.size() -1);
 				try (BufferedReader in = 
-						new BufferedReader(new InputStreamReader(getResource(slideDir + next)))) {
+						new BufferedReader(new InputStreamReader(Utils.getResource(slideDir + next)))) {
 					String video=in.readLine();
 					in.readLine();
 					String left = in.readLine();
@@ -137,7 +131,7 @@ ButtonListener, GestureListener, InfraredListener{
 					String heigth = in.readLine();
 					File tmp = File.createTempFile(video, null);
 					tmp.deleteOnExit();
-					InputStream videoStream = getResource("html/" + video);
+					InputStream videoStream = Utils.getResource("html/" + video);
 					Files.copy(videoStream, Paths.get(tmp.toURI()), StandardCopyOption.REPLACE_EXISTING);
 					nextView.getProperties().put("video", tmp);
 					nextView.getProperties().put("left", left);
@@ -239,6 +233,9 @@ ButtonListener, GestureListener, InfraredListener{
 		if (System.getProperty("nowiimote") == null) {
 			initWiimote();
 		}
+		if (System.getProperty("httpport") != null) {
+			server = new PresentationHttpServer(Integer.parseInt(System.getProperty("httpport")));
+		}
 	}
 
 	public synchronized void handle(KeyEvent event) {
@@ -326,7 +323,7 @@ ButtonListener, GestureListener, InfraredListener{
 			SequentialTransitionBuilder.create().children(move, zoom).onFinished(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent arg0) {
-					runVideo((File)prevSlide.getProperties().get("video"));
+					Utils.runVideo((File)prevSlide.getProperties().get("video"));
 				}
 			}).build().play();
 			index--;
@@ -429,109 +426,6 @@ ButtonListener, GestureListener, InfraredListener{
 		}
 	}
 
-	private String[] getResourceListing(String path) {
-		URL dirURL = getClass().getClassLoader().getResource(path);
-		if (dirURL == null) {
-			String me = getClass().getName().replace(".", "/")+".class";
-			dirURL = getClass().getClassLoader().getResource(me);
-		}
-		if (dirURL != null) {
-			if  (dirURL.getProtocol().equals("file")) {
-				try {
-					File[] files = new File(dirURL.toURI()).listFiles();
-					String[] ret = new String[files.length];
-					for (int i = 0; i < files.length; i++) {
-						if (files[i].isDirectory()) {
-							ret[i] = files[i].getName() + "/";
-						} else {
-							ret[i] = files[i].getName();
-						}
-					}
-					return ret;
-				} catch (URISyntaxException e) {
-					e.printStackTrace();
-				}
-			} else if (dirURL.getProtocol().equals("jar")) {
-				String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!"));
-				Set<String> entries = getJarEntries(jarPath); 
-				Set<String> result = new HashSet<String>(); 
-				for (String name : entries) {
-					if (name.startsWith(path)) {
-						String entry = name.substring(path.length());
-						int checkSubdir = entry.indexOf("/");
-						if (checkSubdir >= 0) {
-							entry = entry.substring(0, checkSubdir + 1);
-						}
-						result.add(entry);
-					}
-				}
-				return result.toArray(new String[result.size()]);
-			} 
-		}
-		throw new UnsupportedOperationException("Cannot list files for URL "+dirURL);
-	}
-
-	private static synchronized Set<String> getJarEntries(String jarPath) {
-		Set<String> result = new HashSet<String>();
-		JarFile jar = null;
-		try {
-			File jarFile = new File(URLDecoder.decode(jarPath, "UTF-8"));
-			if (jarEntryCache.containsKey(jarFile.getAbsolutePath())) {
-				return jarEntryCache.get(jarFile.getAbsolutePath());
-			} else {
-				jar = new JarFile(jarFile);
-				Enumeration<JarEntry> entries = jar.entries(); 
-				while(entries.hasMoreElements()) {
-					result.add(entries.nextElement().getName());
-				}
-				jarEntryCache.put(jarFile.getAbsolutePath(), result);
-			}
-		} catch (UnsupportedEncodingException e1) {
-			e1.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (jar != null) {
-				try {
-					jar.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return result;
-	}
-
-	private InputStream getResource(String name) {
-		System.out.println("Getting resource: " + name);
-		return getClass().getClassLoader().getResourceAsStream(name);
-	}
-
-	private void runVideo(File video) {
-		String s = null;
-		try {
-			Process p = Runtime.getRuntime().exec("videoplayer " + video.getAbsolutePath());
-
-			BufferedReader stdInput = new BufferedReader(new 
-					InputStreamReader(p.getInputStream()));
-
-			BufferedReader stdError = new BufferedReader(new 
-					InputStreamReader(p.getErrorStream()));
-
-			while ((s = stdInput.readLine()) != null) {
-				System.out.println(s);
-			}
-
-			while ((s = stdError.readLine()) != null) {
-				System.out.println(s);
-			}
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-
 	private class SlowingInterpolator extends Interpolator {
 
 		@Override
@@ -558,7 +452,7 @@ ButtonListener, GestureListener, InfraredListener{
 			for (String nextGesture : new String[] {"right", "left", "up", "down", "circleCW", "circleCCW" }) {
 				File tmp = File.createTempFile("gesture_" + nextGesture, ".txt");
 				tmp.deleteOnExit();
-				InputStream gestureStream = getResource("gestureset/" + nextGesture + ".txt") ;
+				InputStream gestureStream = Utils.getResource("gestureset/" + nextGesture + ".txt") ;
 				Files.copy(gestureStream , Paths.get(tmp.toURI()), StandardCopyOption.REPLACE_EXISTING);
 				String gestureName = tmp.getAbsolutePath().substring(0, tmp.getAbsolutePath().length() - 4);
 				wiimote.loadGesture(gestureName);
@@ -690,6 +584,7 @@ ButtonListener, GestureListener, InfraredListener{
 		try {
 			double x = pointer[0]* screenWidth/1024;
 			double y = (768-pointer[1])*screenHeight/768;
+			@SuppressWarnings("deprecation")
 			final MouseEvent e = MouseEvent.impl_mouseEvent(x, y, x, y, MouseButton.NONE, 0, false, false, false, false, false, false, false, false, false, MouseEvent.MOUSE_MOVED);
 			Platform.runLater(new Runnable() {
 				@Override
