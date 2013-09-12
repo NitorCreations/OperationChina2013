@@ -1,7 +1,36 @@
 <html>
 <head>
+<style type="text/css">
+.fadein {
+  position:relative;
+  width:1024px;
+  height:768px;
+}
+.fadein iframe {
+  position:absolute;
+  left:0;
+  top:0;
+  zoom: 0.526315789;
+  -moz-transform: scale(0.526315789);
+  -moz-transform-origin: 0 0;
+  -o-transform: scale(0.526315789);
+  -o-transform-origin: 0 0;
+  -webkit-transform: scale(0.526315789);
+  -webkit-transform-origin: 0 0;
+}
+
+</style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script>
+$(function(){
+	$('.fadein iframe:gt(0)').hide();
+	setInterval(function(){$('.fadein :first-child').fadeOut().next('iframe').fadeIn().end().appendTo('.fadein');}, 3000);
+});
+</script>
 </head>
 <body>
+  <div class="fadein">
 <!--frames-->
+  </div>
 </body>
 </html>
