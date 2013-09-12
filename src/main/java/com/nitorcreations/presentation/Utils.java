@@ -91,25 +91,45 @@ public class Utils {
 	}
 
 	public static void runVideo(final File video) {
-		String s = null;
 		try {
 			Process p = Runtime.getRuntime().exec("videoplayer " + video.getAbsolutePath());
 
-			BufferedReader stdInput = new BufferedReader(new 
+			final BufferedReader stdInput = new BufferedReader(new 
 					InputStreamReader(p.getInputStream()));
 
-			BufferedReader stdError = new BufferedReader(new 
+			final BufferedReader stdError = new BufferedReader(new 
 					InputStreamReader(p.getErrorStream()));
 
-			while ((s = stdInput.readLine()) != null) {
-				System.out.println(s);
-			}
+			new Thread(new Runnable() {
+				String s = null;
+				public void run() {
+					try {
+						while ((s = stdInput.readLine()) != null) {
+							System.out.println(s);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				};
+			}).start();
 
-			while ((s = stdError.readLine()) != null) {
-				System.out.println(s);
-			}
+			new Thread(new Runnable() {
+				String s = null;
+				public void run() {
+					try {
+						while ((s = stdError.readLine()) != null) {
+							System.out.println(s);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
+			p.waitFor();
 		}
 		catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
