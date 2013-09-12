@@ -91,33 +91,28 @@ public class Utils {
 	}
 
 	public static void runVideo(final File video) {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				String s = null;
-				try {
-					Process p = Runtime.getRuntime().exec("videoplayer " + video.getAbsolutePath());
-	
-					BufferedReader stdInput = new BufferedReader(new 
-							InputStreamReader(p.getInputStream()));
-	
-					BufferedReader stdError = new BufferedReader(new 
-							InputStreamReader(p.getErrorStream()));
-	
-					while ((s = stdInput.readLine()) != null) {
-						System.out.println(s);
-					}
-	
-					while ((s = stdError.readLine()) != null) {
-						System.out.println(s);
-					}
-				}
-				catch (IOException e) {
-					e.printStackTrace();
-				}
-				
+		String s = null;
+		try {
+			Process p = Runtime.getRuntime().exec("videoplayer " + video.getAbsolutePath());
+
+			BufferedReader stdInput = new BufferedReader(new 
+					InputStreamReader(p.getInputStream()));
+
+			BufferedReader stdError = new BufferedReader(new 
+					InputStreamReader(p.getErrorStream()));
+
+			while ((s = stdInput.readLine()) != null) {
+				System.out.println(s);
 			}
-		}).start();
+
+			while ((s = stdError.readLine()) != null) {
+				System.out.println(s);
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	public static InputStream getResource(String name) {
