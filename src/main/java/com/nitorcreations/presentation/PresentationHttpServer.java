@@ -43,6 +43,8 @@ public class PresentationHttpServer {
 			String requestMethod = exchange.getRequestMethod();
 			if (requestMethod.equalsIgnoreCase("GET")) {
 				Headers responseHeaders = exchange.getResponseHeaders();
+				responseHeaders.set("Accept-Ranges", "bytes");
+				
 				URI uri = exchange.getRequestURI();
 				String resourceName = "html" + uri.getPath();
 				if (uri.getPath().equals("/")) {
@@ -58,26 +60,20 @@ public class PresentationHttpServer {
 					return;
 				}
 				byte[] content = getContent(resourceName);
+				responseHeaders.set("ETag", md5sums.get(resourceName));
 				if (content != null) {
 					if (uri.getPath().endsWith(".html")) {
 						responseHeaders.set("Content-Type", "text/html");
-					}
-					if (uri.getPath().toLowerCase().endsWith(".png")) {
+					} else if (uri.getPath().toLowerCase().endsWith(".png")) {
 						responseHeaders.set("Content-Type", "image/png");
-					}
-					if (uri.getPath().toLowerCase().endsWith(".jpg") ||
+					} else if (uri.getPath().toLowerCase().endsWith(".jpg") ||
 							uri.getPath().toLowerCase().endsWith(".jpeg")) {
 						responseHeaders.set("Content-Type", "image/jpeg");
-					}
-					if (uri.getPath().toLowerCase().endsWith(".mp4")) {
+					} else if (uri.getPath().toLowerCase().endsWith(".mp4")) {
 						responseHeaders.set("Content-Type", "video/mp4");
-					}
-					if (uri.getPath().toLowerCase().endsWith(".ogv")) {
+					} else if (uri.getPath().toLowerCase().endsWith(".ogv")) {
 						responseHeaders.set("Content-Type", "video/ogg");
 					}
-					responseHeaders.set("Accept-Ranges", "bytes");
-					String md5sum = md5sums.get(resourceName);
-					responseHeaders.set("ETag", md5sum);
 					if (range == null || range.size() == 0) {
 						exchange.sendResponseHeaders(200, content.length);
 						OutputStream responseBody = exchange.getResponseBody();
@@ -129,9 +125,9 @@ public class PresentationHttpServer {
 						responseHeaders.set("Content-Range", "bytes " + ret.start
 								+ "-" + ret.end + "/"
 								+ ret.length);
-						exchange.sendResponseHeaders(206, ret.end - ret.start + 1);
+						exchange.sendResponseHeaders(206, ret.rangeLen);
 						OutputStream responseBody = exchange.getResponseBody();
-						responseBody.write(content, ret.start, ret.end - ret.start + 1);
+						responseBody.write(content, ret.start, ret.rangeLen);
 						responseBody.close();
 					}
 				} else {
@@ -181,14 +177,13 @@ public class PresentationHttpServer {
 
         public int start;
         public int end;
+        public int rangeLen;
         public int length;
 
-        /**
-         * Validate range.
-         */
         public boolean validate() {
             if (end >= length)
                 end = length - 1;
+            rangeLen=end-start+1;
             return (start >= 0) && (end >= 0) && (start <= end) && (length > 0);
         }
     }
