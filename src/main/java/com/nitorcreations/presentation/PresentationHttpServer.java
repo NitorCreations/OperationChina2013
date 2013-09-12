@@ -166,7 +166,9 @@ public class PresentationHttpServer {
 					sb.append(Integer.toHexString((digest[i] & 0xFF) | 0x100).substring(1,3));
 				}
 				md5sums.put(resourceName, sb.toString());
-				contents.put(resourceName, cached);
+				if (System.getProperty("nocache") == null) {
+					contents.put(resourceName, cached);
+				}
 			}
 		}
 		return cached;
