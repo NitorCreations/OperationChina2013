@@ -1,0 +1,10 @@
+        <li class="page">
+          <div class="page-content">
+            <div class="left">
+              <div class="content">
+                <iframe src="@slide_html@" width="200%" height="200%" frameborder="0"></iframe>
+              </div>
+            </div>
+          </div>
+        </li>
+
