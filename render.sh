@@ -4,7 +4,17 @@ mkdir -p target/classes/slides-small
 
 for slide in target/classes/markdown/*.md; do
   slidename=$(basename $slide .md)
-  sed -i "s/<\!--frames-->/\<iframe src=\"$slidename.html\" width=\"100%\" height=\"100%\" frameborder=\"0\"\><\/iframe>\n<\!--frames-->/" target/classes/html/index.html
+  export frame=$(sed "s/@slidename@/$slidename/g" target/classes/frame-template.txt)
+  TMP=$(mktemp)
+  sed -i 's/<\!--frames-->/\${frame}\n<\!--frames-->/' target/classes/html/index.html
+  mvn -q -Dexec.mainClass=com.nitorcreations.core.utils.Templater -Dexec.arguments=target/classes/html/index.html exec:java > $TMP
+  slide_notes=" "
+  if [ -r $slide.notes ]; then
+    slide_notes=$(pandoc --from markdown --to html $slide.notes)
+  fi
+  export slide_notes
+  mvn -q -Dexec.mainClass=com.nitorcreations.core.utils.Templater -Dexec.arguments=$TMP exec:java > target/classes/html/index.html
+  rm -f $TMP
   pandoc --from markdown --to html --standalone --css=nitor.css $slide --output target/classes/html/$slidename.html
   phantomjs render.js target/classes/html/$slidename.html target/classes/slides/$slidename.png
   VIDEO=$(phantomjs videoposition.js target/classes/html/$slidename.html)
