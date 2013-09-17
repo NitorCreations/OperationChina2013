@@ -280,7 +280,7 @@ ButtonListener, GestureListener, InfraredListener{
 				index = slides.length -1;
 				break;
 			default:
-				break;
+				return;
 			}
 			if (index < 0) {
 				index = 0;
