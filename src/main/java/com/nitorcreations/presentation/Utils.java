@@ -16,6 +16,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class Utils {
+    static final byte[] HEX_BYTES = new byte[]
+            {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
 	public static String[] getResourceListing(String path) {
 		URL dirURL = Utils.class.getClassLoader().getResource(path);
@@ -138,6 +140,29 @@ public class Utils {
 	public static InputStream getResource(String name) {
 		System.out.println("Getting resource: " + name);
 		return Utils.class.getClassLoader().getResourceAsStream(name);
+	}
+
+	public static String toHexString(byte[] digest) {
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < digest.length; ++i) {
+			sb.append(Integer.toHexString((digest[i] & 0xFF) | 0x100).substring(1,3));
+		}
+		return sb.toString();
+	}
+
+	public static byte[] toHexBytes(byte[] toBeConverted) {
+	    if (toBeConverted == null) {
+	        throw new NullPointerException("Parameter to be converted can not be null");
+	    }
+	
+	    byte[] converted = new byte[toBeConverted.length * 2];
+	    for (int i = 0; i < toBeConverted.length; i++) {
+	        byte b = toBeConverted[i];
+	        converted[i * 2] = HEX_BYTES[b >> 4 & 0x0F];
+	        converted[i * 2 + 1] = HEX_BYTES[b & 0x0F];
+	    }
+	
+	    return converted;
 	}
 
 }

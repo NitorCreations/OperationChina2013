@@ -1,6 +1,7 @@
 package com.nitorcreations.presentation;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,10 +13,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
+
 import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -26,12 +30,17 @@ public class PresentationHttpServer {
 	private Map<String, byte[]> contents = new HashMap<>();
 	private Map<String, String> md5sums = new ConcurrentHashMap<>();
 	MessageDigest md5;
-	
+
 	public PresentationHttpServer(int port) throws IOException, NoSuchAlgorithmException {
 		InetSocketAddress addr = new InetSocketAddress(port);
 		HttpServer server = HttpServer.create(addr, 0);
 
-		server.createContext("/", new RequestHandler());
+		HttpContext cc = server.createContext("/", new RequestHandler());
+		if (System.getProperty("httppasswords") != null) {
+			Properties passwd = new Properties();
+			passwd.load(new FileInputStream(System.getProperty("httppasswords")));
+			cc.setAuthenticator(new DigestAuthenticator(passwd, "presentation"));
+		}
 		server.setExecutor(Executors.newCachedThreadPool());
 		server.start();
 		System.out.println("Server is listening on port " + port );
@@ -44,7 +53,7 @@ public class PresentationHttpServer {
 			if (requestMethod.equalsIgnoreCase("GET")) {
 				Headers responseHeaders = exchange.getResponseHeaders();
 				responseHeaders.set("Accept-Ranges", "bytes");
-				
+
 				URI uri = exchange.getRequestURI();
 				String resourceName = "html" + uri.getPath();
 				if (uri.getPath().equals("/")) {
@@ -143,7 +152,7 @@ public class PresentationHttpServer {
 			}
 		}
 	}
-	
+
 	private synchronized byte[] getContent(String resourceName) throws IOException {
 		byte[] cached = contents.get(resourceName);
 		if (cached == null) {
@@ -161,11 +170,7 @@ public class PresentationHttpServer {
 				cached = out.toByteArray();
 				md5.reset();
 				byte[] digest = md5.digest(cached);
-				StringBuffer sb = new StringBuffer();
-				for (int i = 0; i < digest.length; ++i) {
-					sb.append(Integer.toHexString((digest[i] & 0xFF) | 0x100).substring(1,3));
-				}
-				md5sums.put(resourceName, sb.toString());
+				md5sums.put(resourceName, Utils.toHexString(digest));
 				if (System.getProperty("nocache") == null) {
 					contents.put(resourceName, cached);
 				}
@@ -174,19 +179,19 @@ public class PresentationHttpServer {
 		return cached;
 	}
 
-	
-    protected static class Range {
 
-        public int start;
-        public int end;
-        public int rangeLen;
-        public int length;
+	protected static class Range {
 
-        public boolean validate() {
-            if (end >= length)
-                end = length - 1;
-            rangeLen=end-start+1;
-            return (start >= 0) && (end >= 0) && (start <= end) && (length > 0);
-        }
-    }
+		public int start;
+		public int end;
+		public int rangeLen;
+		public int length;
+
+		public boolean validate() {
+			if (end >= length)
+				end = length - 1;
+			rangeLen=end-start+1;
+			return (start >= 0) && (end >= 0) && (start <= end) && (length > 0);
+		}
+	}
 }

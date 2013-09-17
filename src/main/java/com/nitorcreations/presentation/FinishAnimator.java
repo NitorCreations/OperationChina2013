@@ -1,12 +1,8 @@
 package com.nitorcreations.presentation;
 
 import javafx.animation.Interpolator;
-import javafx.animation.RotateTransition;
 import javafx.animation.RotateTransitionBuilder;
-import javafx.animation.ScaleTransition;
 import javafx.animation.ScaleTransitionBuilder;
-import javafx.animation.SequentialTransitionBuilder;
-import javafx.animation.TranslateTransition;
 import javafx.animation.TranslateTransitionBuilder;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
