@@ -35,11 +35,17 @@ public class PresentationHttpServer {
 		InetSocketAddress addr = new InetSocketAddress(port);
 		HttpServer server = HttpServer.create(addr, 0);
 
-		HttpContext cc = server.createContext("/", new RequestHandler());
-		if (System.getProperty("httppasswords") != null) {
+		HttpContext cc = server.createContext("/run/", new RequestHandler("run"));
+		if (System.getProperty("httprunpasswords") != null) {
 			Properties passwd = new Properties();
-			passwd.load(new FileInputStream(System.getProperty("httppasswords")));
-			cc.setAuthenticator(new DigestAuthenticator(passwd, "presentation"));
+			passwd.load(new FileInputStream(System.getProperty("httprunpasswords")));
+			cc.setAuthenticator(new DigestAuthenticator(passwd, "run-presentation"));
+		}
+		cc = server.createContext("/follow/", new RequestHandler("follow"));
+		if (System.getProperty("httpfollowpasswords") != null) {
+			Properties passwd = new Properties();
+			passwd.load(new FileInputStream(System.getProperty("httpfollowpasswords")));
+			cc.setAuthenticator(new DigestAuthenticator(passwd, "follow-presentation"));
 		}
 		server.setExecutor(Executors.newCachedThreadPool());
 		server.start();
@@ -48,6 +54,11 @@ public class PresentationHttpServer {
 	}
 
 	class RequestHandler implements HttpHandler {
+		private final String context;
+		
+		public RequestHandler(String context) {
+			this.context = context;
+		}
 		public void handle(HttpExchange exchange) throws IOException {
 			String requestMethod = exchange.getRequestMethod();
 			if (requestMethod.equalsIgnoreCase("GET")) {
@@ -55,9 +66,9 @@ public class PresentationHttpServer {
 				responseHeaders.set("Accept-Ranges", "bytes");
 
 				URI uri = exchange.getRequestURI();
-				String resourceName = "html" + uri.getPath();
-				if (uri.getPath().equals("/")) {
-					resourceName = "html/index.html";
+				String resourceName = "html" + uri.getPath().substring(context.length() + 1);
+				if ("html/".equals(resourceName) || "html/index.html".equals(resourceName)) {
+					resourceName = "html/index-" + context + ".html";
 				}
 				List<String> inmatch = exchange.getRequestHeaders().get("If-None-Match");
 				List<String> range = exchange.getRequestHeaders().get("Range");
