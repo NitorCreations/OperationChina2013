@@ -47,6 +47,12 @@ public class PresentationHttpServer {
 			passwd.load(new FileInputStream(System.getProperty("httpfollowpasswords")));
 			cc.setAuthenticator(new DigestAuthenticator(passwd, "follow-presentation"));
 		}
+		cc = server.createContext("/", new RequestHandler(""));
+		if (System.getProperty("httpdefaultpasswords") != null) {
+			Properties passwd = new Properties();
+			passwd.load(new FileInputStream(System.getProperty("httpdefaultpasswords")));
+			cc.setAuthenticator(new DigestAuthenticator(passwd, "default-presentation"));
+		}
 		server.setExecutor(Executors.newCachedThreadPool());
 		server.start();
 		System.out.println("Server is listening on port " + port );
@@ -66,9 +72,17 @@ public class PresentationHttpServer {
 				responseHeaders.set("Accept-Ranges", "bytes");
 
 				URI uri = exchange.getRequestURI();
-				String resourceName = "html" + uri.getPath().substring(context.length() + 1);
-				if ("html/".equals(resourceName) || "html/index.html".equals(resourceName)) {
-					resourceName = "html/index-" + context + ".html";
+				String path = uri.getPath().substring(context.length() + 1);
+				if (path.startsWith("/")) {
+					path = path.substring(1);
+				}
+				String resourceName = "html/" + path; 
+				if ("html/".equals(resourceName) || resourceName.startsWith("html/index")) {
+					if (context.length() == 0) {
+						resourceName = "html/index-default.html";
+					} else {
+						resourceName = "html/index-" + context + ".html";
+					}
 				}
 				List<String> inmatch = exchange.getRequestHeaders().get("If-None-Match");
 				List<String> range = exchange.getRequestHeaders().get("Range");
