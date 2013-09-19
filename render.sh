@@ -9,16 +9,16 @@ for slide in target/classes/markdown/*.md; do
   TMP_FOLLOW=$(mktemp)
   sed -i 's/<\!--frames-->/\${frame}\n<\!--frames-->/' target/classes/html/index-run.html
   sed -i 's/<\!--frames-->/\${frame}\n<\!--frames-->/' target/classes/html/index-follow.html
-  mvn -q -Dexec.mainClass=com.nitorcreations.core.utils.Templater -Dexec.arguments=target/classes/html/index-run.html exec:java > $TMP_RUN
-  mvn -q -Dexec.mainClass=com.nitorcreations.core.utils.Templater -Dexec.arguments=target/classes/html/index-follow.html exec:java > $TMP_FOLLOW
+  mvn -q -Ptemplater -DtemplateFile=target/classes/html/index-run.html validate > $TMP_RUN
+  mvn -q -Ptemplater -DtemplateFile=target/classes/html/index-follow.html validate > $TMP_FOLLOW
   slide_notes=" "
   export slide_notes
-  mvn -q -Dexec.mainClass=com.nitorcreations.core.utils.Templater -Dexec.arguments=$TMP_FOLLOW exec:java > target/classes/html/index-follow.html
+  mvn -q -Ptemplater -DtemplateFile=$TMP_FOLLOW validate > target/classes/html/index-follow.html
   if [ -r $slide.notes ]; then
     slide_notes=$(pandoc --from markdown --to html $slide.notes)
   fi
   export slide_notes
-  mvn -q -Dexec.mainClass=com.nitorcreations.core.utils.Templater -Dexec.arguments=$TMP_RUN exec:java > target/classes/html/index-run.html
+  mvn -q -Ptemplater -DtemplateFile=$TMP_RUN validate > target/classes/html/index-run.html
   rm -f $TMP_RUN $TMP_FOLLOW
   pandoc --from markdown --to html --standalone --css=nitor.css $slide --output target/classes/html/$slidename.html
   phantomjs render.js target/classes/html/$slidename.html target/classes/slides/$slidename.png
