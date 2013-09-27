@@ -55,7 +55,8 @@
           </execution>
         </executions>
         <configuration>
-          <executable>render.sh</executable>
+          <executable>make</executable>
+          <arguments><argument>-j6</argument></arguments>
         </configuration>
       </plugin>
       <plugin>

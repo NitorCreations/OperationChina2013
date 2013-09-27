@@ -3,7 +3,7 @@
 <link rel="stylesheet" media="all" href="styles.css">
 </head>
 <body>
-  <div id="contend">
+  <div id="content">
     <div id="swipe-container">
       <ul id="pages">
 <!--frames-->
@@ -17,20 +17,19 @@
   <script>
     'use strict';
     var onResize = function() {
-      var newWidth = $(window).width() / 2;
-      var newHeight = (newWidth * 1280) / 1920;
+      var newWidth = $(window).width();
       var newZoom = newWidth / 1920;
-      $('iframe').css({
-        "top": 0,
-        "left": 0,
-        "zoom": newZoom,
-        "-moz-transform": "scale(" + newZoom + ")",
-        "-moz-transform-origin": "0 0",
-        "-o-transform": "scale(" + newZoom + ")",
-        "-o-transform-origin": "0 0",
-        "-webkit-transform": "scale(" + newZoom + ")",
-        "-webkit-transform-origin": "0 0"
-      });
+      if (newWidth > 980 || window.matchMedia("(orientation:landscape").matches) {
+        newZoom = newZoom / 2;
+      }
+      $('iframe').css({ "top": 0, "left": 0, 
+  "zoom": newZoom,
+  "-moz-transform": "scale(" + newZoom + ")", 
+  "-moz-transform-origin": "0 0",
+  "-o-transform": "scale(" + newZoom + ")",
+  "-o-transform-origin": "0 0",
+  "-webkit-transform": "scale(" + newZoom + ")",
+  "-webkit-transform-origin": "0 0" });
       $('iframe').height(Math.floor(100/newZoom) + "%");
       $('iframe').width(Math.floor(100/newZoom) + "%");
     }
@@ -71,7 +70,10 @@
       $(window).on("load", function() {
         container.css("opacity", 1)
       });
-    });
+      $(window).resize(onResize);
+      onResize();
+ });
   </script>
+
 </body>
 </html>
