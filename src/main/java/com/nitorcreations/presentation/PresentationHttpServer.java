@@ -31,17 +31,17 @@ public class PresentationHttpServer {
 	private Map<String, String> md5sums = new ConcurrentHashMap<>();
 	MessageDigest md5;
 
-	public PresentationHttpServer(int port) throws IOException, NoSuchAlgorithmException {
+	public PresentationHttpServer(int port, PresentationController controller) throws IOException, NoSuchAlgorithmException {
 		InetSocketAddress addr = new InetSocketAddress(port);
 		HttpServer server = HttpServer.create(addr, 0);
 
-		HttpContext cc = server.createContext("/run/", new RequestHandler("run"));
+		HttpContext cc = server.createContext("/run/", new RequestHandler("run", controller));
 		if (System.getProperty("httprunpasswords") != null) {
 			Properties passwd = new Properties();
 			passwd.load(new FileInputStream(System.getProperty("httprunpasswords")));
 			cc.setAuthenticator(new DigestAuthenticator(passwd, "run-presentation"));
 		}
-		cc = server.createContext("/follow/", new RequestHandler("follow"));
+		cc = server.createContext("/follow/", new RequestHandler("follow", controller));
 		if (System.getProperty("httpfollowpasswords") != null) {
 			Properties passwd = new Properties();
 			passwd.load(new FileInputStream(System.getProperty("httpfollowpasswords")));
@@ -61,10 +61,17 @@ public class PresentationHttpServer {
 
 	class RequestHandler implements HttpHandler {
 		private final String context;
+		private PresentationController controller = null;
 		
 		public RequestHandler(String context) {
 			this.context = context;
 		}
+		
+		public RequestHandler(String context, PresentationController controller) {
+			this.context = context;
+			this.controller = controller;
+		}
+		
 		public void handle(HttpExchange exchange) throws IOException {
 			String requestMethod = exchange.getRequestMethod();
 			if (requestMethod.equalsIgnoreCase("GET")) {
@@ -76,6 +83,49 @@ public class PresentationHttpServer {
 				if (path.startsWith("/")) {
 					path = path.substring(1);
 				}
+				
+				if (path.startsWith("show") && context.equals("run")) {
+					responseHeaders.set("Content-Type", "text/plain");
+					try {
+						int slideIndex = Integer.parseInt(path.split("/")[1]);
+						if (path.startsWith("showquick")) {
+							controller.showSlide(slideIndex, true);
+						} else {
+							controller.showSlide(slideIndex);
+						}
+						exchange.sendResponseHeaders(200, 0);
+						OutputStream responseBody = exchange.getResponseBody();
+						responseBody.write(Integer.toString(controller.curentSlide()).getBytes());
+						responseBody.close();
+					} catch (NullPointerException | ArrayIndexOutOfBoundsException | NumberFormatException e) {
+						System.out.println("Illegal slide show command " + path);
+						exchange.sendResponseHeaders(400, 0);
+						OutputStream responseBody = exchange.getResponseBody();
+						responseBody.write(("Bad request: " + path).getBytes());
+						responseBody.close();
+					}
+					return;
+				}
+
+				if (path.startsWith("currentslide") && (context.equals("run") || context.equals("follow"))) {
+					responseHeaders.set("Content-Type", "text/plain");
+					exchange.sendResponseHeaders(200, 0);
+					OutputStream responseBody = exchange.getResponseBody();
+					responseBody.write(Integer.toString(controller.curentSlide()).getBytes());
+					responseBody.close();
+					return;
+				}
+
+				if (path.startsWith("slidecount") && (context.equals("run") || context.equals("follow"))) {
+					responseHeaders.set("Content-Type", "text/plain");
+					exchange.sendResponseHeaders(200, 0);
+					OutputStream responseBody = exchange.getResponseBody();
+					responseBody.write(Integer.toString(controller.curentSlide()).getBytes());
+					responseBody.close();
+					return;
+				}
+				
+				
 				String resourceName = "html/" + path; 
 				if ("html/".equals(resourceName) || resourceName.startsWith("html/index")) {
 					if (context.length() == 0) {

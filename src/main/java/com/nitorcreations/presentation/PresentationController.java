@@ -234,7 +234,7 @@ ButtonListener, GestureListener, InfraredListener{
 			initWiimote();
 		}
 		if (System.getProperty("httpport") != null) {
-			server = new PresentationHttpServer(Integer.parseInt(System.getProperty("httpport")));
+			server = new PresentationHttpServer(Integer.parseInt(System.getProperty("httpport")), this);
 		}
 	}
 
@@ -294,10 +294,31 @@ ButtonListener, GestureListener, InfraredListener{
 				tryVibrate(150);
 			}
 			showSlide(slides[index], quick);
-
 		}
 	}
-
+	public synchronized int slideCount() {
+		return slides.length;
+	}
+	public synchronized int curentSlide() {
+		return index;
+	}
+	
+	public synchronized void showSlide(int index) {
+		showSlide(index, false);
+	}
+	
+	public synchronized void showSlide(final int index, final boolean quick) {
+		if (index >= slides.length) throw new ArrayIndexOutOfBoundsException(index);
+		this.index = index;
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				showSlide(slides[index], quick);
+			}
+		});
+	}
+	
+	
 	private void showSlide(final ImageView slide, boolean quick) {
 		if (prevSlide != null && prevSlide.getProperties().get("video") != null && !videoPlayed) {
 			videoPlayed = true;
