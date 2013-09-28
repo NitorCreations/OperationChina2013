@@ -22,6 +22,8 @@
 
   <script>
     'use strict';
+    var changeOnEnd = false;
+    var currentSlide = 0;
     var onResize = function() {
       var newWidth = $(window).width();
       var newZoom = newWidth / 1920;
@@ -77,7 +79,36 @@
         container.css("opacity", 1)
       });
       $(window).resize(onResize);
+
       onResize();
+
+      $("#swipe-container").dragend({ onSwipeEnd: function(arg, arg2) {
+        currentSlide = $(arg2).index();
+        if (changeOnEnd) {
+          changeOnEnd = false;
+          var quick="";
+          if ($("#quick").is(':checked')) { quick = "quick"; }
+          $.get("show" + quick + "/" + currentSlide);
+        }
+      } });
+      $(".showthis").on("click", function() {
+          var quick="";
+          if ($("#quick").is(':checked')) { quick = "quick"; }
+          $.get("show" + quick + "/" + currentSlide);
+      });
+      $(".shownext").on("click", function() {
+         changeOnEnd = true;
+          $("#swipe-container").dragend("left");
+      });
+      $(".showprev").on("click", function() {
+         changeOnEnd = true;
+          $("#swipe-container").dragend("right");
+      });
+      $(".sync").on("click", function() {
+         $.get("currentslide", function(data) {
+           $("#swipe-container").dragend({ scrollToPage: Math.floor(data) });
+         });
+      });
  });
   </script>
 

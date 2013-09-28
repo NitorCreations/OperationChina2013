@@ -78,6 +78,12 @@
       });
       $(window).resize(onResize);
       onResize();
+      $(".sync").on("click", function() {
+         $.get("currentslide", function(data) {
+           $("#swipe-container").dragend({ scrollToPage: Math.floor(data) });
+         });
+      });
+
  });
   </script>
 
