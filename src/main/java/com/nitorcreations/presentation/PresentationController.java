@@ -308,7 +308,7 @@ ButtonListener, GestureListener, InfraredListener{
 	}
 	
 	public synchronized void showSlide(final int index, final boolean quick) {
-		if (index >= slides.length) throw new ArrayIndexOutOfBoundsException(index);
+		if (index >= slides.length || index < 0) throw new ArrayIndexOutOfBoundsException(index);
 		this.index = index;
 		Platform.runLater(new Runnable() {
 			@Override
