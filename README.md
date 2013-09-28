@@ -93,11 +93,20 @@ class.
 ## HTTP server ##
 
 You can start a http server that serves the slides by adding ```-Dhttpport={port}```. Navigating to the root of that
-server will then load all of the slides. Later I plan to enable following the current slide of the presentation being shown
-and to control the slideshow so that you could for example skip some slides.
+server will then load all of the slides.
 
-Also a nice thing I could add would be to offer zip downloads containing either html or the png format of the slides.
+There are four contexts for the http server. 
+ * ```default``` shows the default index page. I put it ```src/main/resources/index-default.html```
+ * ```run``` allows running the on-screen presentation from a browser
+ * ```follow``` allows following the presentation in a browser
+ * ```download``` allows downloading the presentation in a couple of formats contained in a single zip file.
 
+Each can have set passwords by defining ```-Dhttp{context}passwords={password.properties}``` where password.properties is just
+a property file with ```username=password``` entries. The authentication method used is digest authentication so getting the
+run password in an open WLAN is not trivial. The presentation already stretches the capabilities of the Raspberry Pi so I didn't
+want to over stretch by using SSL and for most situations I think that would be overkill.
+
+	
 ## Caveats ##
 
 The build works on my Ubuntu workstation and my Ubuntu jenkins server and I really have very little interest in making

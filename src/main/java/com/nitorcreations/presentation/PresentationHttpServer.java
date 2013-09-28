@@ -1,21 +1,33 @@
 package com.nitorcreations.presentation;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import javafx.scene.image.ImageView;
 
 
 import com.sun.net.httpserver.Headers;
@@ -52,6 +64,12 @@ public class PresentationHttpServer {
 			Properties passwd = new Properties();
 			passwd.load(new FileInputStream(System.getProperty("httpdefaultpasswords")));
 			cc.setAuthenticator(new DigestAuthenticator(passwd, "default-presentation"));
+		}
+		cc = server.createContext("/download/", new DownloadHandler());
+		if (System.getProperty("httpdownloadpasswords") != null) {
+			Properties passwd = new Properties();
+			passwd.load(new FileInputStream(System.getProperty("httpdownloadpasswords")));
+			cc.setAuthenticator(new DigestAuthenticator(passwd, "download-presentation"));
 		}
 		server.setExecutor(Executors.newCachedThreadPool());
 		server.start();
@@ -222,12 +240,90 @@ public class PresentationHttpServer {
 					responseBody.close();
 
 				}
-			} else if (requestMethod.equalsIgnoreCase("HEAD")) {
-				System.out.println("HEAD request for "  + exchange.getRequestURI().getPath());
 			}
 		}
 	}
+	
+	class DownloadHandler implements HttpHandler {
 
+		@Override
+		public void handle(HttpExchange exchange) throws IOException {
+			Headers responseHeaders = exchange.getResponseHeaders();
+			String path = exchange.getRequestURI().getPath().substring("/download".length());
+			if (path.startsWith("/")) {
+				path = path.substring(1);
+			}
+			if ((path.startsWith("slides") || path.startsWith("html")) && path.endsWith(".zip")) {
+				String slideSet = path.substring(0, path.length() - 4);
+				String slideDir = slideSet + "/";
+				String[] slides = Utils.getResourceListing(slideDir);
+				if (slides == null || slides.length == 0) {
+					responseHeaders.set("Content-Type", "text/plain");
+					exchange.sendResponseHeaders(404, 0);
+					OutputStream responseBody = exchange.getResponseBody();
+					responseBody.write("Not found".getBytes());
+					responseBody.close();
+					return;
+				}
+				responseHeaders.set("Content-Type", "application/zip");
+				responseHeaders.set("Content-disposition", "attachment; filename=" + path);
+				exchange.sendResponseHeaders(200, 0);
+				ZipOutputStream out = new ZipOutputStream(exchange.getResponseBody());
+				List<String> slideNames = Arrays.asList(slides);
+				Collections.sort(slideNames);
+				for (String next : slideNames) {
+					if (next.isEmpty() || next.equals("/")) continue;
+					if (next.endsWith(".video")) {
+						try (BufferedReader in = 
+								new BufferedReader(new InputStreamReader(Utils.getResource(slideDir + next)))) {
+							String video=in.readLine();
+							writeNextEntry(out, Utils.getResource("html/" + video), next + "." + video);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					} else {
+						writeNextEntry(out, Utils.getResource(slideDir + next), next);
+					}	
+				}
+				out.close();
+			} else if (path.equals("presentation-small-images.zip")) {
+				responseHeaders.set("Content-Type", "application/zip");
+				responseHeaders.set("Content-disposition", "attachment; filename=presentation-images.zip");
+			} else if (path.equals("presentation-small-images.zip")) {
+				responseHeaders.set("Content-Type", "application/zip");
+				responseHeaders.set("Content-disposition", "attachment; filename=presentation-images.zip");
+			} else {
+				responseHeaders.set("Content-Type", "text/plain");
+				exchange.sendResponseHeaders(404, 0);
+				OutputStream responseBody = exchange.getResponseBody();
+				responseBody.write("Not found".getBytes());
+				responseBody.close();
+			}
+		}
+		
+		final byte[] buffer = new byte[1024];
+    	
+		private void writeNextEntry(ZipOutputStream out, InputStream in, String name) {
+	        try {
+	        	out.putNextEntry(new ZipEntry(name));
+	        	int count;
+
+	        	while ((count = in.read(buffer)) > 0) {
+	        		out.write(buffer, 0, count);
+	        	}
+	        } catch (IOException e) {
+	        	e.printStackTrace();
+	        } finally {
+	        	if (in != null) {
+	        		try {
+						in.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+	        	}
+	        }
+		}
+	}
 	private synchronized byte[] getContent(String resourceName) throws IOException {
 		byte[] cached = contents.get(resourceName);
 		if (cached == null) {
