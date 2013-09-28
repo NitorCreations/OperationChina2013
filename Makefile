@@ -28,16 +28,17 @@ target/frames-run:  $(patsubst %,target/frame-%-run,$(frames))
 	touch $@ #marker
 
 target/classes/html/%.html: target/classes/markdown/%.md
-	pandoc --from markdown --to html --standalone --css=nitor.css $< --output $@.tmp
+	pandoc --from markdown --to html --standalone --css=nitor.css $< --output $@.tmp.html
 	mkdir -p target/classes/slides
+	mkdir -p target/classes/slides-small
 	video=$(patsubst target/classes/html/%.html,%.video,$@) ; \
-	phantomjs videoposition.js $@.tmp > target/classes/slides/$$video && \
+	phantomjs videoposition.js $@.tmp.html > target/classes/slides/$$video && \
 	if [ -s target/classes/slides/$$video ]; then \
 		cp target/classes/slides/$$video target/classes/slides-small/$$video ; \
 	else \
 		rm target/classes/slides/$$video ; \
 	fi
-	mv $@.tmp $@
+	mv $@.tmp.html $@
 
 htmls: $(patsubst %,target/classes/html/%.html,$(frames))
 
