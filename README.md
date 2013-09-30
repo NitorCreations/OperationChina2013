@@ -64,6 +64,15 @@ If you don't want to use the wiimote:
 java -Dslides=slides-small -Dnowiimote=true -jar jfx-presentation-shanghai-1.0-jfx.jar
 ```
 
+Running the http server requires specifying a port and on the Rasbperry Pi you don't want to
+cache all the contents in memory. You also probably want to specify a password for context that
+controls the presentation:
+
+```
+java -Dslides=slides-small -Dhttpport=9999 -Dhttprunpasswords=.passwords -Dnocache=true -jar jfx-presentation-shanghai-1.0-jfx.jar
+```
+
+
 ## Using ##
 
 For now the easiest way of using this is to fork this repo, create your own css and background and write your own
