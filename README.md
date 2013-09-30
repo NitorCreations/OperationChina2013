@@ -1,11 +1,11 @@
-# JavaOne Shanghai 2013 javafx presentation #
+# Developer Oriented Presentation Engine #
 
 So I won a Raspberry Pi from [this session](https://oraclecn.activeevents.com/connect/sessionDetail.ww?SESSION_ID=2231)
 at JavaOne and as [Stephen Chin](http://steveonjava.com/) gave it to me, he asked me to let him know if I did 
 anything cool with it.
 
 Also, [my employer](http://nitorcreations.com) encourages us to summarise any sessions we've attended and this work
-is now how I thought I could combine (hopefully) something cool and a very short summary of the conference for my 
+here is how I thought I could combine (hopefully) something cool and a very short summary of the conference for my 
 colleagues.
 
 ## Features ##
@@ -13,7 +13,7 @@ colleagues.
 All of the source of the slides in the presentation are markdown. If you run out of markdown features, you can just
 put in html as with the [video](src/main/resources/markdown/36_oracle_event.md).
 
-The presentation can be controlled with either a keyboard or a Nintendo Wii controller:
+The presentation can be controlled with a keyboard, a Nintendo Wii controller or a browser:
 
 * Up key, Wiimote direction button up or the gesture "up": Fast transition forward
     * Just rotate to the rotation of the target slide and move it into place
@@ -30,9 +30,9 @@ The presentation can be controlled with either a keyboard or a Nintendo Wii cont
 
 The video integration is a bit tricky since Java 8 javafx that is running on the raspberry pi can't
 run it out of the box. What happens is that the build script records the position of the video placeholder image
-and at runtime the presentation extracts the video into a temporary file. Then when the slide is traversed it zooms in on the
-placeholder and runs ```videoplayer {temporaryfile}```. On my Raspberry Pi this script is in ```/usr/bin/videoplayer```:
-
+and at runtime the presentation extracts the video into a temporary file. Then when you navigate away from the the slide
+it zooms in on the placeholder and runs ```videoplayer {temporaryfile}```. 
+On my Raspberry Pi this script is in ```/usr/bin/videoplayer```:
 
 ```
 #!/bin/bash
@@ -72,10 +72,11 @@ markdown slides. The transitions aren't that complex so even those are potential
 To get this to work on an Ubuntu box, you need to set up the tools:
 
 ```
-sudo apt-get install phantomjs imagemagick pandoc optipng
+sudo apt-get install imagemagick pandoc optipng make perl
 ```
 
-Will probably have pretty close to the same packages, but I haven't tried it.
+Will probably have pretty close to the same packages, but I haven't tried it. [Phantomjs](http://phantomjs.org/) needs 
+to be a recent version, so just download that and put it onto the path.
 
 The relative directory for referring to stuff from html is ```src/main/resources/html``` so that is where your images
 and videos go.
@@ -93,7 +94,7 @@ class.
 ## HTTP server ##
 
 You can start a http server that serves the slides by adding ```-Dhttpport={port}```. Navigating to the root of that
-server will then load all of the slides.
+server will then give you the default index page with links to the contexts.
 
 There are four contexts for the http server. 
  * ```default``` shows the default index page. I put it ```src/main/resources/index-default.html```
@@ -102,9 +103,9 @@ There are four contexts for the http server.
  * ```download``` allows downloading the presentation in a couple of formats contained in a single zip file.
 
 Each can have set passwords by defining ```-Dhttp{context}passwords={password.properties}``` where password.properties is just
-a property file with ```username=password``` entries. The authentication method used is digest authentication so getting the
+a property file with ```username=password``` entries. The authentication method used is digest authentication so sniffing the
 run password in an open WLAN is not trivial. The presentation already stretches the capabilities of the Raspberry Pi so I didn't
-want to over stretch by using SSL and for most situations I think that would be overkill.
+want to push it by using SSL. For most situations I think that would be overkill.
 
 	
 ## Caveats ##
@@ -116,8 +117,10 @@ it work on any other platform. Mainly it requires the following external tools (
  * [phantomjs](http://phantomjs.org/) for converting from html (+css etc.) to png images
  * [optipng](http://optipng.sourceforge.net/) for optimizing the resulting images
  * [convert from imagemagick](http://www.imagemagick.org/) for scaling down for smaller slides on the raspberrypi
+ * ```make``` for running all this with with maximum parallel threads
+ * perl for some string substitution
 
-These are run as a part of the compile phase in maven through [render.sh](render.sh). 
+These are run as a part of the compile phase in maven through [make](Makefile). 
 
 For the javafx tooling in this it uses [javafx-maven-plugin](http://zenjava.com/javafx/maven/)
 so building the jar is just:
@@ -126,7 +129,7 @@ so building the jar is just:
 mvn clean com.zenjava:javafx-maven-plugin:jar
 ```
 
-The resulting javafx binaries will be under ```target/jfx/app```. Dependencies will go into the lib subdirectory -
+The resulting javafx binaries will be under ```target/jfx/app```. Dependencies will go into the ```lib``` subdirectory -
 all of them need to be included when running.
 
 ## Acknowledgements ##
