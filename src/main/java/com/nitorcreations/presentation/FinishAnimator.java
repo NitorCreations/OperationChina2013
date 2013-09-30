@@ -10,6 +10,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
+@SuppressWarnings("restriction")
 public class FinishAnimator implements EventHandler<ActionEvent> {
 
 	private final ImageView slide;

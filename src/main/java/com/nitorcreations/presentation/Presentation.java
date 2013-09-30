@@ -7,6 +7,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+@SuppressWarnings("restriction")
 public class Presentation extends Application{
     
     @Override

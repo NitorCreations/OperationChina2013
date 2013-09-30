@@ -1,6 +1,7 @@
 package com.nitorcreations.presentation;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,13 +10,29 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class Utils {
+	private static Map<String, byte[]> contents = new HashMap<>();
+	public  static Map<String, String> md5sums = new ConcurrentHashMap<>();
+	private static MessageDigest md5;
+	static {
+		try {
+			md5 = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+	}
+
     static final byte[] HEX_BYTES = new byte[]
             {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
@@ -163,6 +180,32 @@ public class Utils {
 	    }
 	
 	    return converted;
+	}
+
+	synchronized static byte[] getContent(String resourceName) throws IOException {
+		byte[] cached = contents.get(resourceName);
+		if (cached == null) {
+			try (InputStream in = Utils.getResource(resourceName)) {
+				if (in == null) {
+					return null;
+				}
+				byte[] buffer = new byte[1024];
+				int len = in.read(buffer);
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				while (len != -1) {
+					out.write(buffer, 0, len);
+					len = in.read(buffer);
+				}
+				cached = out.toByteArray();
+				md5.reset();
+				byte[] digest = md5.digest(cached);
+				md5sums.put(resourceName, Utils.toHexString(digest));
+				if (System.getProperty("nocache") == null) {
+					contents.put(resourceName, cached);
+				}
+			}
+		}
+		return cached;
 	}
 
 }

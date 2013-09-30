@@ -65,6 +65,7 @@ import org.wiigee.event.GestureListener;
 import org.wiigee.event.InfraredEvent;
 import org.wiigee.event.InfraredListener;
 
+@SuppressWarnings("restriction")
 public class PresentationController implements EventHandler<KeyEvent>, 
 ButtonListener, GestureListener, InfraredListener{
 	static Map<String, Set<String>> jarEntryCache = new HashMap<String, Set<String>>();
