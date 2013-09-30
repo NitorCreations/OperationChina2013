@@ -1,6 +1,34 @@
 <html>
 <head>
 <link rel="stylesheet" media="all" href="styles.css">
+<style type="text/css">
+#swipe-container .page-content {
+  padding: 0.5rem 5rem;
+}
+#swipe-container .left {
+  float: none;
+  width: 80%;
+}
+@media only screen and (orientation: portrait) {
+  #swipe-container .page-content {
+    padding: 0.5rem 1rem;
+  }
+  #swipe-container .left {
+    float: none;
+    width: 80%;
+  }
+}
+
+@media only screen and and (max-width: 980px) {
+  #swipe-container .page-content {
+    padding: 0.5rem 1rem;
+  }
+  #swipe-container .left {
+    float: none;
+    width: 80%;
+  }
+}
+</style>
 </head>
 <body>
   <header>
@@ -24,10 +52,7 @@
     'use strict';
     var onResize = function() {
       var newWidth = $(window).width();
-      var newZoom = newWidth / 1920;
-      if (newWidth > 980 || window.matchMedia("(orientation:landscape").matches) {
-        newZoom = newZoom / 2;
-      }
+      var newZoom = newWidth * 0.8 / 1920;
       $('iframe').css({ "top": 0, "left": 0, 
   "zoom": newZoom,
   "-moz-transform": "scale(" + newZoom + ")", 
