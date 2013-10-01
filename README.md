@@ -126,8 +126,8 @@ it work on any other platform. Mainly it requires the following external tools (
  * [phantomjs](http://phantomjs.org/) for converting from html (+css etc.) to png images
  * [optipng](http://optipng.sourceforge.net/) for optimizing the resulting images
  * [convert from imagemagick](http://www.imagemagick.org/) for scaling down for smaller slides on the raspberrypi
- * ```make``` for running all this with with maximum parallel threads
- * perl for some string substitution
+ * ```make``` for running all this with maximum parallel threads
+ * ```perl``` for some string substitution
 
 These are run as a part of the compile phase in maven through [make](Makefile). 
 
