@@ -1,5 +1,10 @@
 # Developer Oriented Presentation Engine #
 
+This repository contains a presentation engine that is meant to run on the Raspberry Pi and a sample
+presentation with a reasonable amount of slides.
+
+## Background ##
+
 So I won a Raspberry Pi from [this session](https://oraclecn.activeevents.com/connect/sessionDetail.ww?SESSION_ID=2231)
 at JavaOne and as [Stephen Chin](http://steveonjava.com/) gave it to me, he asked me to let him know if I did 
 anything cool with it.
