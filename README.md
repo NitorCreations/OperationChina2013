@@ -141,6 +141,14 @@ mvn clean com.zenjava:javafx-maven-plugin:jar
 The resulting javafx binaries will be under ```target/jfx/app```. Dependencies will go into the ```lib``` subdirectory -
 all of them need to be included when running.
 
+The above goal and an assembly that creates a zip with the javafx jar plus dependencies are bound to ```package``` and
+```pre-integration-test``` phases respectively, so creating a zip with everything is just:
+
+```
+mvn clean install
+```
+
+
 ## Acknowledgements ##
 
 The Wiimote integration is thanks to [Wiigee project](http://www.wiigee.org/) and underneath that I rely on the java
