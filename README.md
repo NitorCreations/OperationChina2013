@@ -1,6 +1,6 @@
 # Developer Oriented Presentation Engine #
 
-<img width="600" src="frontpage.jpg" alt="Developer Oriented Presentation Engine"/>
+<img style="width: 600px; text-align: center; display:inline-block;" src="frontpage.jpg" alt="Developer Oriented Presentation Engine"/>
 
 This repository contains a presentation engine that is meant to run on the Raspberry Pi and a sample
 presentation with a reasonable amount of slides. The general idea is that you can write your presentation
