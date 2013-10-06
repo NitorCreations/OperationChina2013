@@ -6,7 +6,7 @@ This repository contains a presentation engine that is meant to run on the Raspb
 presentation with a reasonable amount of slides. The general idea is that you can write your presentation
 with [Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) and then build that into
 a zip file that you can then run on any platform that runs JavaFX. [Here](https://www.youtube.com/watch?v=1sdZpecv9a8)
-is an introductory video in how it works.
+is an introductory video on how it works.
 
 
 ## Background ##
