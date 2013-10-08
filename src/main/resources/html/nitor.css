@@ -1,12 +1,12 @@
 *{margin:0;padding:0;font:42px verdana,Helvetica,sans-serif;}
 
 html {
-  background-image:url('nitor_background.png');
-  background-repeat:no-repeat;
-  background-size: cover;
 }
 
 body{
+  background-image:url('nitor_background.png');
+  background-repeat:no-repeat;
+  background-size: cover;
   font:42px verdana,Helvetica,sans-serif;
   opacity: 1;
 }
@@ -24,5 +24,17 @@ ul li ul{margin:20px 40px;list-style-image:url('bullet3.png');}
 code{font-size:42px;font-family:courier}
 span{font-size:42px;font-family:courier}
 
-img, video, video img {height:700px;width:auto;display: block;margin-left: auto;margin-right: auto}
+img, video, video img {height:700px;width:auto;display: block;margin-left: auto;margin-right: auto }
 
+@media print {
+  html {
+    width: 1920px;
+    height: 1080px;
+    background-image:url('nitor_background.png');
+    background-repeat:no-repeat;
+    background-size: 1920px 1080px;
+    opacity: 1;
+    margin: 0;
+    padding: 0;
+  }
+}
