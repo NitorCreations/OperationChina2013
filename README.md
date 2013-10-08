@@ -117,7 +117,8 @@ You can start a http server that serves the slides by adding ```-Dhttpport={port
 server will then give you the default index page with links to the contexts.
 
 There are four contexts for the http server. 
- * ```default``` shows the default index page. I put it ```src/main/resources/index-default.html```
+ * ```default``` shows the default index page. The default served page is ```src/main/resources/index-default.html```
+     * Also the presentation pdf if served from this context by default
  * ```run``` allows running the on-screen presentation from a browser
  * ```follow``` allows following the presentation in a browser
  * ```download``` allows downloading the presentation in a couple of formats contained in a single zip file.
@@ -139,6 +140,7 @@ it work on any other platform. Mainly it requires the following external tools (
  * [convert from imagemagick](http://www.imagemagick.org/) for scaling down for smaller slides on the raspberrypi
  * ```make``` for running all this with maximum parallel threads
  * ```perl``` for some string substitution
+ * ```pdfunite``` To concatenate the slide pdf files into a single presentation pdf
 
 These are run as a part of the compile phase in maven through [make](Makefile). 
 
