@@ -15,7 +15,7 @@ So I won a Raspberry Pi from [this session](https://oraclecn.activeevents.com/co
 at JavaOne and as [Stephen Chin](http://steveonjava.com/) gave it to me, he asked me to let him know if I did 
 anything cool with it.
 
-Also, [my employer](http://nitorcreations.com) encourages us to summarise any sessions we've attended and this work
+Also, [my employer](http://nitorcreations.com) encourages us to summarize any sessions we have attended and this work
 here is how I thought I could combine (hopefully) something cool and a very short summary of the conference for my 
 colleagues.
 
@@ -28,18 +28,18 @@ The presentation can be controlled with a keyboard, a Nintendo Wii controller or
 
 * Up key, Wiimote direction button up or the gesture "up": Fast transition forward
     * Just rotate to the rotation of the target slide and move it into place
-    * First transtion is always slow - slides dropping and spreading out
+    * First transition is always slow - slides dropping and spreading out
     * Transition to a slide with video is also always the longer one
 * Right key, Wiimote direction button right or the gesture "right": Slow transition forward
     * Zoom out and rotate to original orientation, move to on top of the next slide and then zoom in and rotate for the target slide
 * Down key, Wiimote direction button down or the gesture "down": Fast transition backward
-* Left key, Wiimote direction button left or the gesture "left": Slow transtion backward
+* Left key, Wiimote direction button left or the gesture "left": Slow transition backward
 * Key A, Wiimote button '-' or the gesture "clockwise circle": Slow transition to the first slide
-* Key E, Wiimote button '2' or the gesture "counter clockwise circle": Slow transtion to the last slide
-* Wiimote button 'A': draw highlight where the wiimote Infrared mouse is pointing
-* Wiimote button 'B': try to recongnize gesture
+* Key E, Wiimote button '2' or the gesture "counter clockwise circle": Slow transition to the last slide
+* Wiimote button 'A': draw highlight where the Wiimote Infrared mouse is pointing
+* Wiimote button 'B': try to recognize gesture
 
-The video integration is a bit tricky since Java 8 javafx that is running on the raspberry pi can't
+The video integration is a bit tricky since Java 8 JavaFX that is running on the raspberry pi can't
 run it out of the box. What happens is that the build script records the position of the video placeholder image
 and at runtime the presentation extracts the video into a temporary file. Then when you navigate away from the the slide
 it zooms in on the placeholder and runs ```videoplayer {temporaryfile}```. 
@@ -69,13 +69,13 @@ On the raspberry Pi this requires using the smaller images to fit into memory:
 java -Dslides=slides-small -jar jfx-presentation-shanghai-1.0-jfx.jar
 ```
 
-If you don't want to use the wiimote:
+If you don't want to use the Wiimote:
 
 ```
 java -Dslides=slides-small -Dnowiimote=true -jar jfx-presentation-shanghai-1.0-jfx.jar
 ```
 
-Running the http server requires specifying a port and on the Rasbperry Pi you don't want to
+Running the http server requires specifying a port and on the Raspberry Pi you don't want to
 cache all the contents in memory. You also probably want to specify a password for context that
 controls the presentation:
 
@@ -89,19 +89,10 @@ java -Dslides=slides-small -Dhttpport=9999 -Dhttprunpasswords=.passwords -Dnocac
 For now the easiest way of using this is to fork this repo, create your own css and background and write your own
 markdown slides. The transitions aren't that complex so even those are potential targets for change.
 
-To get this to work on an Ubuntu box, you need to set up the tools:
-
-```
-sudo apt-get install imagemagick pandoc optipng make perl
-```
-
-Will probably have pretty close to the same packages, but I haven't tried it. [Phantomjs](http://phantomjs.org/) needs 
-to be a recent version, so just download that and put it onto the path.
-
 The relative directory for referring to stuff from html is ```src/main/resources/html``` so that is where your images
 and videos go.
 
-After that you just build your jar as described below and run it as describted above.
+After that you just build your jar as described below and run it as described above.
 
 ## Gestures ##
 
@@ -129,37 +120,29 @@ run password in an open WLAN is not trivial. The presentation already stretches 
 want to push it by using SSL. For most situations I think that would be overkill.
 
 	
-## Caveats ##
+## Building ##
 
-The build works on my Ubuntu workstation and my Ubuntu jenkins server and I really have very little interest in making
-it work on any other platform. Mainly it requires the following external tools (in addition to maven - naturally):
+The build works on my Ubuntu workstation and my Ubuntu jenkins server, but it should work on any computer with [Maven 3.0.5](http://maven.apache.org).
 
- * [pandoc](http://johnmacfarlane.net/pandoc/) for converting from markdown to html
- * [phantomjs](http://phantomjs.org/) for converting from html (+css etc.) to png images
- * [optipng](http://optipng.sourceforge.net/) for optimizing the resulting images
- * [convert from imagemagick](http://www.imagemagick.org/) for scaling down for smaller slides on the raspberrypi
- * ```make``` for running all this with maximum parallel threads
- * ```perl``` for some string substitution
- * ```pdfunite``` To concatenate the slide pdf files into a single presentation pdf
+The bulk of the work is handled with the [dope-maven-plugin](https://github.com/NitorCreations/dope-maven-plugin). It uses the following libraries for the job:
+ * [txtmark](https://github.com/rjeschke/txtmark) to transform the markdown to html
+ * [embeddedphantomjs](https://github.com/Jarlakxen/embedphantomjs) to render png images and pdf documents from the html
+ * [imgscalr](http://www.thebuzzmedia.com/software/imgscalr-java-image-scaling-library/) for creating the smaller images from the FullHD ones and
+ * [velocity](http://velocity.apache.org/) to create the index pages from templates
+ * [pdfbox](http://pdfbox.apache.org/) to merge the single slide pdf documents in to the full presentation document
 
-These are run as a part of the compile phase in maven through [make](Makefile). 
+For the JavaFX tooling in this it uses [javafx-maven-plugin](http://zenjava.com/javafx/maven/) The ```jar``` goal in the JavaFX maven plugin and an 
+assembly that creates a zip with the JavaFX jar plus dependencies are bound to ```package``` and ```pre-integration-test``` phases respectively, so 
+creating a zip with everything is just:
 
-For the javafx tooling in this it uses [javafx-maven-plugin](http://zenjava.com/javafx/maven/)
 so building the jar is just:
-
-```
-mvn clean com.zenjava:javafx-maven-plugin:jar
-```
-
-The resulting javafx binaries will be under ```target/jfx/app```. Dependencies will go into the ```lib``` subdirectory -
-all of them need to be included when running.
-
-The above goal and an assembly that creates a zip with the javafx jar plus dependencies are bound to ```package``` and
-```pre-integration-test``` phases respectively, so creating a zip with everything is just:
 
 ```
 mvn clean install
 ```
+
+The resulting javafx binaries will be under ```target/jfx/app```. Dependencies will go into the ```lib``` subdirectory -
+all of them need to be included when running and they are packaged in the resulting zip file.
 
 
 ## Acknowledgements ##
