@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.nitorcreations</groupId>
   <artifactId>jfx-presentation-shanghai</artifactId>
-  <version>1.2-SNAPSHOT</version>
+  <version>2.0</version>
   <name>JavaOne Shanghai</name>
   <organization>
     <name>Nitor Creations</name>
