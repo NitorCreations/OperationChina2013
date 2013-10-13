@@ -131,6 +131,10 @@ The bulk of the work is handled with the [dope-maven-plugin](https://github.com/
  * [velocity](http://velocity.apache.org/) to create the index pages from templates
  * [pdfbox](http://pdfbox.apache.org/) to merge the single slide pdf documents in to the full presentation document
 
+Before ```txtmark``` the markdown to html conversion was handled with [pandoc](http://johnmacfarlane.net/pandoc/) and that had nice out-of-the box formatting
+for source code embedded in the markdown. ```txtmark``` is much simpler and lacks these extensions however. My workaround for this is to run the code through 
+pandoc and embed the resulting html in the markdown. The css files have some colors set up for the classes pandoc generates.
+
 For the JavaFX tooling in this it uses [javafx-maven-plugin](http://zenjava.com/javafx/maven/) The ```jar``` goal in the JavaFX maven plugin and an 
 assembly that creates a zip with the JavaFX jar plus dependencies are bound to ```package``` and ```pre-integration-test``` phases respectively, so 
 creating a zip with everything is just:
