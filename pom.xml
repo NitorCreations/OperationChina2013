@@ -48,7 +48,7 @@
           </execution>
         </executions>
         <configuration>
-        	<css>nitor.css</css>
+        	<css>light.css</css>
         </configuration>
       </plugin>
       <plugin>
