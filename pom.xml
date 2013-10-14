@@ -48,7 +48,7 @@
           </execution>
         </executions>
         <configuration>
-        	<css>light.css</css>
+        	<css>dark.css</css>
         </configuration>
       </plugin>
       <plugin>
