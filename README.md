@@ -125,15 +125,15 @@ want to push it by using SSL. For most situations I think that would be overkill
 The build works on my Ubuntu workstation and my Ubuntu jenkins server, but it should work on any computer with [Maven 3.0.5](http://maven.apache.org).
 
 The bulk of the work is handled with the [dope-maven-plugin](https://github.com/NitorCreations/dope-maven-plugin). It uses the following libraries for the job:
- * [txtmark](https://github.com/rjeschke/txtmark) to transform the markdown to html
+ * [pegdown](https://github.com/sirthias/pegdown) to transform the markdown to html
  * [embeddedphantomjs](https://github.com/Jarlakxen/embedphantomjs) to render png images and pdf documents from the html
  * [imgscalr](http://www.thebuzzmedia.com/software/imgscalr-java-image-scaling-library/) for creating the smaller images from the FullHD ones and
  * [velocity](http://velocity.apache.org/) to create the index pages from templates
  * [pdfbox](http://pdfbox.apache.org/) to merge the single slide pdf documents in to the full presentation document
+ * [jhighlight](http://freecode.com/projects/jhighlight) for syntax highlighting inline code blocks.
 
-Before ```txtmark``` the markdown to html conversion was handled with [pandoc](http://johnmacfarlane.net/pandoc/) and that had nice out-of-the box formatting
-for source code embedded in the markdown. ```txtmark``` is much simpler and lacks these extensions however. My workaround for this is to run the code through 
-pandoc and embed the resulting html in the markdown. The css files have some colors set up for the classes pandoc generates.
+Before ```pegdown``` the markdown to html conversion was handled with [pandoc](http://johnmacfarlane.net/pandoc/) and that had nice out-of-the box formatting
+for source code embedded in the markdown. ```pegdown``` is much simpler and lacks these extensions however. I extend ```pegdown``` here with 
 
 For the JavaFX tooling in this it uses [javafx-maven-plugin](http://zenjava.com/javafx/maven/) The ```jar``` goal in the JavaFX maven plugin and an 
 assembly that creates a zip with the JavaFX jar plus dependencies are bound to ```package``` and ```pre-integration-test``` phases respectively, so 

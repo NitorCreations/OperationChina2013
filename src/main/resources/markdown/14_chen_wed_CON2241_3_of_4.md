@@ -2,15 +2,18 @@
 
 ## Lambda expressions ##
 
-<pre class="sourceCode java"><code class="sourceCode java">    shapes.<span class="fu">forEach</span>(s -&gt; {
-        <span class="kw">if</span> (s.<span class="fu">getColor</span>() == RED)
-            s.<span class="fu">setColor</span>(BLUE);
-    })</code></pre>
+```java
+    shapes.forEach(s -> {
+        if (s.getColor() == RED)
+            s.setColor(BLUE);
+    })
+```
 
 ## Bulk operations on Collections ##
 
-<pre class="sourceCode java"><code class="sourceCode java">    shapes.<span class="fu">forEach</span>(s -&gt; {
-        <span class="kw">if</span> (s.<span class="fu">getColor</span>() == RED)
-            s.<span class="fu">setColor</span>(BLUE);
-    })</code></pre>
+```java
+    List<Shape> blueBlocks = shapes.stream()
+         .filter(s -> s.getColor() == BLUE)
+         .into(new ArrayList<>());
+```
 
