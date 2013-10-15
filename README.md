@@ -141,8 +141,6 @@ For the JavaFX tooling in this it uses [javafx-maven-plugin](http://zenjava.com/
 assembly that creates a zip with the JavaFX jar plus dependencies are bound to ```package``` and ```pre-integration-test``` phases respectively, so 
 creating a zip with everything is just:
 
-so building the jar is just:
-
 ```
 mvn clean install
 ```
