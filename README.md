@@ -133,7 +133,9 @@ The bulk of the work is handled with the [dope-maven-plugin](https://github.com/
  * [jhighlight](http://freecode.com/projects/jhighlight) for syntax highlighting inline code blocks.
 
 Before ```pegdown``` the markdown to html conversion was handled with [pandoc](http://johnmacfarlane.net/pandoc/) and that had nice out-of-the box formatting
-for source code embedded in the markdown. ```pegdown``` is much simpler and lacks these extensions however. I extend ```pegdown``` here with 
+for source code embedded in the markdown. ```pegdown``` is much simpler and lacks these extensions however. I extend ```pegdown``` here with ```jhighlight```
+to get some of the same functionality, but the choise of highlighted languages is now much smaller. Extending ```pegdown``` is really easy though - all you
+need is a source to html conversion and matching styles in the css.
 
 For the JavaFX tooling in this it uses [javafx-maven-plugin](http://zenjava.com/javafx/maven/) The ```jar``` goal in the JavaFX maven plugin and an 
 assembly that creates a zip with the JavaFX jar plus dependencies are bound to ```package``` and ```pre-integration-test``` phases respectively, so 
