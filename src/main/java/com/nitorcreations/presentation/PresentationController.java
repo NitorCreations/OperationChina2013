@@ -117,6 +117,11 @@ ButtonListener, GestureListener, InfraredListener{
 		}
 		List<String> slideNames = Arrays.asList(Utils.getResourceListing(slideDir));
 		Collections.sort(slideNames);
+		boolean hasTitle = false;
+		if (slideNames.indexOf("title.png") > -1) {
+			slideNames.remove(slideNames.indexOf("title.png"));
+			hasTitle = true;
+		}
 		ArrayList<ImageView> slideList = new ArrayList<>();
 		for (String next : slideNames) {
 			if (next.isEmpty() || next.equals("/")) continue;
@@ -156,6 +161,18 @@ ButtonListener, GestureListener, InfraredListener{
 				nextView.setRotate(Math.random() * 360);
 			}
 		}
+		if (hasTitle) {
+			ImageView nextView = new ImageView();
+			nextView.setFitWidth(SLIDE_WIDTH);
+			nextView.setFitHeight(SLIDE_HEIGHT);
+			nextView.setPreserveRatio(true);
+			nextView.setVisible(true);
+			nextView.setFocusTraversable(false);
+			nextView.setLayoutX(screenWidth/2);
+			nextView.setLayoutX(screenHeight/2);
+			nextView.setImage(new Image(slideDir + "title.png"));
+			slideList.add(nextView);
+		}
 		slides = (ImageView[]) slideList.toArray(new ImageView[slideList.size()]);
 		slideGroup = new Group(slides);
 		int paneSections = new Double(Math.ceil(Math.sqrt(slides.length))).intValue();
@@ -189,6 +206,8 @@ ButtonListener, GestureListener, InfraredListener{
 		screenWidth = primaryScreenBounds.getMaxX();
 		screenHeight = primaryScreenBounds.getMaxY();
 		SCALE = screenWidth / SLIDE_WIDTH;
+		slideGroup.setScaleX(SCALE);
+		slideGroup.setScaleY(SCALE);
 		OUT_SCALE = screenWidth / rootPane.getPrefWidth();
 		rootPane.setStyle("-fx-background-color: #a0a0a0;");
 
