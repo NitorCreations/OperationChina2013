@@ -3,11 +3,19 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.nitorcreations</groupId>
   <artifactId>jfx-presentation-shanghai</artifactId>
-  <version>2.1</version>
+  <version>2.2-SNAPSHOT</version>
   <name>JavaOne Shanghai</name>
+  <developers>
+  	<developer>
+  	  <name>Pasi Niemi</name>
+  	  <id>psiniemi</id>
+  	  <email>pasi.niemi@nitorcreations.com</email>
+  	</developer>
+  </developers>
   <organization>
     <name>Nitor Creations</name>
   </organization>
+  <inceptionYear>2013</inceptionYear>
   <dependencies>
     <dependency>
       <groupId>com.oracle</groupId>
@@ -37,7 +45,7 @@
       <plugin>
         <groupId>com.nitorcreations</groupId>
         <artifactId>dope-maven-plugin</artifactId>
-        <version>1.1</version>
+        <version>1.2</version>
         <executions>
           <execution>
           	<id>render</id>
@@ -49,6 +57,7 @@
         </executions>
         <configuration>
         	<css>dark.css</css>
+        	<pngoptimizer>optipng "$png"</pngoptimizer>
         </configuration>
       </plugin>
       <plugin>
