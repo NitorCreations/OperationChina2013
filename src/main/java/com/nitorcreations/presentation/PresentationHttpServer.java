@@ -3,6 +3,7 @@ package com.nitorcreations.presentation;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.rmi.server.ServerCloneException;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 
@@ -12,9 +13,11 @@ import com.sun.net.httpserver.HttpServer;
 
 @SuppressWarnings("restriction")
 public class PresentationHttpServer {
+	private HttpServer server;
+
 	public PresentationHttpServer(int port, PresentationController controller) throws IOException {
 		InetSocketAddress addr = new InetSocketAddress(port);
-		HttpServer server = HttpServer.create(addr, 0);
+		server = HttpServer.create(addr, 0);
 
 		HttpContext cc = server.createContext("/run/", new RequestHandler("run", controller));
 		if (System.getProperty("httprunpasswords") != null) {
@@ -58,5 +61,9 @@ public class PresentationHttpServer {
 			rangeLen=end-start+1;
 			return (start >= 0) && (end >= 0) && (start <= end) && (length > 0);
 		}
+	}
+
+	public void quit() {
+		server.stop(0);
 	}
 }

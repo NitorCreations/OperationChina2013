@@ -115,7 +115,7 @@ ButtonListener, GestureListener, InfraredListener{
 				slideDir = slideDir + "/";
 			}
 		}
-		List<String> slideNames = Arrays.asList(Utils.getResourceListing(slideDir));
+		List<String> slideNames = new ArrayList<String>(Arrays.asList(Utils.getResourceListing(slideDir)));
 		Collections.sort(slideNames);
 		boolean hasTitle = false;
 		if (slideNames.indexOf("title.png") > -1) {
@@ -206,8 +206,6 @@ ButtonListener, GestureListener, InfraredListener{
 		screenWidth = primaryScreenBounds.getMaxX();
 		screenHeight = primaryScreenBounds.getMaxY();
 		SCALE = screenWidth / SLIDE_WIDTH;
-		slideGroup.setScaleX(SCALE);
-		slideGroup.setScaleY(SCALE);
 		OUT_SCALE = screenWidth / rootPane.getPrefWidth();
 		rootPane.setStyle("-fx-background-color: #a0a0a0;");
 
@@ -250,6 +248,7 @@ ButtonListener, GestureListener, InfraredListener{
 					}
 				})
 				.build();
+		showSlide(slideCount() -1, true);
 		if (System.getProperty("nowiimote") == null) {
 			initWiimote();
 		}
@@ -647,5 +646,11 @@ ButtonListener, GestureListener, InfraredListener{
 			}
 		}
 
+	}
+
+	public void quit() {
+		if (server != null) {
+			server.quit();
+		}
 	}
 }
