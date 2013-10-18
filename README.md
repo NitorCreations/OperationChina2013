@@ -130,12 +130,7 @@ The bulk of the work is handled with the [dope-maven-plugin](https://github.com/
  * [imgscalr](http://www.thebuzzmedia.com/software/imgscalr-java-image-scaling-library/) for creating the smaller images from the FullHD ones and
  * [velocity](http://velocity.apache.org/) to create the index pages from templates
  * [pdfbox](http://pdfbox.apache.org/) to merge the single slide pdf documents in to the full presentation document
- * [jhighlight](http://freecode.com/projects/jhighlight) for syntax highlighting inline code blocks.
-
-Before ```pegdown``` the markdown to html conversion was handled with [pandoc](http://johnmacfarlane.net/pandoc/) and that had nice out-of-the box formatting
-for source code embedded in the markdown. ```pegdown``` is much simpler and lacks these extensions however. I extend ```pegdown``` here with ```jhighlight```
-to get some of the same functionality, but the choise of highlighted languages is now much smaller. Extending ```pegdown``` is really easy though - all you
-need is a source to html conversion and matching styles in the css.
+ * [pygments](http://pygments.org/) for syntax highlighting inline code blocks of practically [any language](http://pygments.org/languages/)
 
 For the JavaFX tooling in this it uses [javafx-maven-plugin](http://zenjava.com/javafx/maven/) The ```jar``` goal in the JavaFX maven plugin and an 
 assembly that creates a zip with the JavaFX jar plus dependencies are bound to ```package``` and ```pre-integration-test``` phases respectively, so 
