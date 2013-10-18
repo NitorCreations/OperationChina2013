@@ -45,10 +45,10 @@
       <plugin>
         <groupId>com.nitorcreations</groupId>
         <artifactId>dope-maven-plugin</artifactId>
-        <version>1.4</version>
+        <version>1.5</version>
         <executions>
           <execution>
-          	<id>render</id>
+            <id>render</id>
             <phase>compile</phase>
             <goals>
               <goal>render</goal>
