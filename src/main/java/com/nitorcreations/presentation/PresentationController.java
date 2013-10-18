@@ -90,7 +90,6 @@ ButtonListener, GestureListener, InfraredListener{
 	private boolean videoPlayed = false;
 	private boolean started = false;
 	private SequentialTransition start=null;
-	@SuppressWarnings("unused")
 	private PresentationHttpServer server;
 	private AtomicBoolean a_pressed = new AtomicBoolean(false);
 	private Path wiiTrail = new Path();
