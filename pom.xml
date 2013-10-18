@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.nitorcreations</groupId>
   <artifactId>jfx-presentation-shanghai</artifactId>
-  <version>2.2-SNAPSHOT</version>
-  <name>JavaOne Shanghai</name>
+  <version>2.2</version>
+  <name>JavaOne Shanghai 2013</name>
   <developers>
   	<developer>
   	  <name>Pasi Niemi</name>
