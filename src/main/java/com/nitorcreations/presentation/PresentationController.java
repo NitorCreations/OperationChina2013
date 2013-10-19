@@ -105,6 +105,8 @@ ButtonListener, GestureListener, InfraredListener{
 
 	private double lastdeltaY=0;
 
+	private int startSlide=0;
+
 	public void initialize(AnchorPane root) throws NumberFormatException, IOException, NoSuchAlgorithmException {
 		rootPane = root;
 		String slideDir="slides/";
@@ -170,10 +172,12 @@ ButtonListener, GestureListener, InfraredListener{
 			nextView.setLayoutX(screenWidth/2);
 			nextView.setLayoutX(screenHeight/2);
 			nextView.setImage(new Image(slideDir + "title.png"));
-			slideList.add(nextView);
+			slideList.add(0, nextView);
+			startSlide=1;
 		}
 		slides = (ImageView[]) slideList.toArray(new ImageView[slideList.size()]);
 		slideGroup = new Group(slides);
+		slideGroup.getChildren().get(0).toFront();
 		int paneSections = new Double(Math.ceil(Math.sqrt(slides.length))).intValue();
 		rootPane.setPrefHeight(SlideLocation.SLIDE_SLOT_SIZE * paneSections);
 		rootPane.setPrefWidth(SlideLocation.SLIDE_SLOT_SIZE * paneSections);
@@ -242,12 +246,14 @@ ButtonListener, GestureListener, InfraredListener{
 
 					@Override
 					public void handle(ActionEvent arg0) {
-						index=0;
+						index=startSlide;
 						showSlide(slides[index], false);
 					}
 				})
 				.build();
-		showSlide(slideCount() -1, true);
+		if (hasTitle) {
+			showSlide(0, true);
+		}
 		if (System.getProperty("nowiimote") == null) {
 			initWiimote();
 		}
