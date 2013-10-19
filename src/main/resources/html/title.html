@@ -20,8 +20,9 @@ h1 {
 <body>
 <h1>$name</h1>
 <ul>
-#if ($project.developers[0])
-  <li>$project.developers[0].name (#if ($project.inceptionYear) &copy;$project.inceptionYear #end #if ($project.organization) <i>$project.organization.name</i> ) #end </li>
+#if(!$project.developers.isEmpty())<li>#foreach($developer in $project.developers)
+#if($developer.url)<a href="$developer.url">#end$developer.name#if($developer.url)</a>#end#if($foreach.hasNext)/#end
+#end#if($project.organization)(#if ($project.inceptionYear) &copy;$project.inceptionYear #end <i>$project.organization.name</i> )#end</li>
 #end
 </ul>
 </body>
